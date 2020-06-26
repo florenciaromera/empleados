@@ -5,6 +5,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "categoria")
 public class Categoria {
@@ -22,6 +24,8 @@ public class Categoria {
     // cascade, si traemos desde el repo un obj categoria el cascadeType.All va a traer todos los empleados 
     // fetch, obliga que traiga a todos de una, no se suele utilizar, es por fines educativos, se suele usar LAZY
     @OneToMany (mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    // Ignora ese atributo cuando front lo manda
+    @JsonIgnore
     private List<Empleado> empleados = new ArrayList<>();
 
     public int getCategoriaId() {
