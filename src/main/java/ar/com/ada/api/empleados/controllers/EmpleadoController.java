@@ -2,6 +2,7 @@ package ar.com.ada.api.empleados.controllers;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.ada.api.empleados.entities.Empleado;
+import ar.com.ada.api.empleados.entities.*;
 import ar.com.ada.api.empleados.models.request.InfoEmpleadaRequest;
 import ar.com.ada.api.empleados.models.response.GenericResponse;
 import ar.com.ada.api.empleados.services.*;
@@ -29,7 +30,8 @@ public class EmpleadoController {
         empleado.setEdad(info.edad);
         empleado.setSueldo(info.sueldo);
         empleado.setFechaAlta(new Date());
-        empleado.setCategoria(categoriaService.obtenerPorId(info.categoriaId));
+        Optional<Categoria> c = categoriaService.obtenerPorId(info.categoriaId);
+        empleado.setCategoria(c.isPresent() ? c.get() : null);
         empleado.setEstadoId(1);
         empleadoService.crearEmpleado(empleado);
         GenericResponse gR = new GenericResponse();
