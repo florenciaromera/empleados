@@ -2,7 +2,6 @@ package ar.com.ada.api.empleados.controllers;
 
 import java.util.List;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,9 +24,10 @@ public class CategoriaController {
     @PostMapping("/categorias")
     public ResponseEntity<?> crearCategoria(@RequestBody Categoria categoria){
         categoriaService.crearCategoria(categoria);
+
         GenericResponse gR = new GenericResponse();
         gR.isOk = true;
-        gR.id = categoria.getCategoriaId();
+        // gR.id = categoria.getCategoriaId();
         gR.message = "Categoria creada con exito";
         // damos una respuesta a front
         // serializar, transformar un obj o algo a un flujo de cadena de textos (JSON es un texto, convertimos el obj en 
