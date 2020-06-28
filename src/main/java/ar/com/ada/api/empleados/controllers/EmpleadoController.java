@@ -68,8 +68,12 @@ public class EmpleadoController {
     }
 
     @GetMapping("/empleadas/categorias/{categoriaId}")
-    public ResponseEntity<List<Empleado>> listarPorCategoriaId(@PathVariable int categoriaId){
-        List<Empleado> listaEmpleadas = categoriaService.obtenerPorId(categoriaId).getEmpleados();
+    public ResponseEntity<?> listarPorCategoriaId(@PathVariable int categoriaId){
+        Optional<Categoria> cId = categoriaService.obtenerPorId(categoriaId);
+        if(!cId.isPresent()){
+            return ResponseEntity.badRequest().body("Error, categoriaId= " + categoriaId + " inexistente");
+        }
+        List<Empleado> listaEmpleadas = cId.get().getEmpleados();
         return ResponseEntity.ok(listaEmpleadas);
     }
     // el /sueldos es una forma de expresar que es diferente al put de empleados id
