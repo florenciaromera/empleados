@@ -27,7 +27,7 @@ public class CategoriaController {
 
         GenericResponse gR = new GenericResponse();
         gR.isOk = true;
-        // gR.id = categoria.getCategoriaId();
+        gR.id = categoria.getCategoriaId();
         gR.message = "Categoria creada con exito";
         // damos una respuesta a front
         // serializar, transformar un obj o algo a un flujo de cadena de textos (JSON es un texto, convertimos el obj en 

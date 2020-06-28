@@ -20,7 +20,7 @@ import ar.com.ada.api.empleados.services.CategoriaService;
 public class CategoriaControllerTest {
     private static final String CATEGORIA_CREADA = "Categoria creada con exito";
 
-    private Categoria categoria;
+    private Categoria categoria = new Categoria();
 
     @InjectMocks
     private CategoriaController categoriaController;
@@ -40,6 +40,7 @@ public class CategoriaControllerTest {
         
         GenericResponse gR = (GenericResponse)re.getBody();
         assertEquals(gR.isOk, true);
+        assertEquals(gR.id, categoria.getCategoriaId());
         assertEquals(gR.message, CATEGORIA_CREADA);
     }
 
