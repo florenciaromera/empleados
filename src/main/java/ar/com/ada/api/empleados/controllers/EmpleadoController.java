@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,14 +25,19 @@ public class EmpleadoController {
     CategoriaService categoriaService;
 
     @PostMapping("/empleadas")
-    public ResponseEntity<?> crearEmpleado(@RequestBody InfoEmpleadaRequest info){
+    public ResponseEntity<?> crearEmpleado(@RequestBody InfoEmpleadaRequest info) {
         Empleado empleado = new Empleado();
         empleado.setNombre(info.nombre);
         empleado.setEdad(info.edad);
         empleado.setSueldo(info.sueldo);
         empleado.setFechaAlta(new Date());
+
         Optional<Categoria> c = categoriaService.obtenerPorId(info.categoriaId);
-        empleado.setCategoria(c.isPresent() ? c.get() : null);
+        if(!c.isPresent()){
+            return ResponseEntity.badRequest().body("Error, categoriaId= " + info.categoriaId + " inexistente");
+        }
+
+        empleado.setCategoria(c.get());
         empleado.setEstadoId(1);
         empleadoService.crearEmpleado(empleado);
         GenericResponse gR = new GenericResponse();
