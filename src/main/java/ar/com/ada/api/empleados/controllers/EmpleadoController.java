@@ -30,20 +30,24 @@ public class EmpleadoController {
 
     @PostMapping("/empleadas")
     public ResponseEntity<?> crearEmpleado(@RequestBody InfoEmpleadaRequest info) {
-        Empleado empleado = new Empleado();
-        empleado.setNombre(info.nombre);
-        empleado.setEdad(info.edad);
-        empleado.setSueldo(info.sueldo);
-        empleado.setFechaAlta(new Date());
+        if (empleadoService.obtenerEmpleados().stream().anyMatch(n -> n.getNombre().equals(info.nombre))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: el empleado ya existe");
+        }
 
         Optional<Categoria> c = categoriaService.obtenerPorId(info.categoriaId);
         if(!c.isPresent()){
             return ResponseEntity.badRequest().body("Error, categoriaId= " + info.categoriaId + " inexistente");
         }
 
+        Empleado empleado = new Empleado();
+        empleado.setNombre(info.nombre);
+        empleado.setEdad(info.edad);
+        empleado.setSueldo(info.sueldo);
+        empleado.setFechaAlta(new Date());
         empleado.setCategoria(c.get());
         empleado.setEstadoId(1);
         empleadoService.crearEmpleado(empleado);
+
         GenericResponse gR = new GenericResponse();
         gR.isOk = true;
         gR.id = empleado.getEmpleadoId();

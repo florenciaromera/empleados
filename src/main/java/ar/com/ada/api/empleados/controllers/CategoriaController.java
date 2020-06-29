@@ -3,6 +3,7 @@ package ar.com.ada.api.empleados.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +24,15 @@ public class CategoriaController {
     // buenas practicas sustantivos en plural(api rest)
     @PostMapping("/categorias")
     public ResponseEntity<?> crearCategoria(@RequestBody Categoria categoria){
+        /* List<Categoria> listaCategorias = categoriaService.obtenerCategorias();
+        for(Categoria c : listaCategorias){
+            if(c.getNombre().equals(categoria.getNombre())){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: la categoria ya existe");
+            }
+        } */
+        if (categoriaService.obtenerCategorias().stream().anyMatch(n -> n.getNombre().equals(categoria.getNombre()))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: la categoria ya existe");
+        }
         categoriaService.crearCategoria(categoria);
 
         GenericResponse gR = new GenericResponse();
