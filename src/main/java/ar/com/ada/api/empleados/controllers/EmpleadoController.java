@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.ada.api.empleados.entities.Empleado;
-import ar.com.ada.api.empleados.models.request.InfoEmpleadaRequest;
-import ar.com.ada.api.empleados.models.request.SueldoModifRequest;
+import ar.com.ada.api.empleados.models.request.*;
 import ar.com.ada.api.empleados.models.response.GenericResponse;
 import ar.com.ada.api.empleados.services.*;
 
