@@ -2,6 +2,7 @@ package ar.com.ada.api.empleados.controllers;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.ada.api.empleados.entities.Empleado;
+import ar.com.ada.api.empleados.entities.*;
 import ar.com.ada.api.empleados.models.request.InfoEmpleadaRequest;
 import ar.com.ada.api.empleados.models.request.SueldoModifRequest;
 import ar.com.ada.api.empleados.models.response.GenericResponse;
@@ -28,15 +29,25 @@ public class EmpleadoController {
     CategoriaService categoriaService;
 
     @PostMapping("/empleadas")
-    public ResponseEntity<?> crearEmpleado(@RequestBody InfoEmpleadaRequest info){
+    public ResponseEntity<?> crearEmpleado(@RequestBody InfoEmpleadaRequest info) {
+        if (empleadoService.obtenerEmpleados().stream().anyMatch(n -> n.getNombre().equals(info.nombre))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: el empleado ya existe");
+        }
+
+        Optional<Categoria> c = categoriaService.obtenerPorId(info.categoriaId);
+        if(!c.isPresent()){
+            return ResponseEntity.badRequest().body("Error, categoriaId= " + info.categoriaId + " inexistente");
+        }
+
         Empleado empleado = new Empleado();
         empleado.setNombre(info.nombre);
         empleado.setEdad(info.edad);
         empleado.setSueldo(info.sueldo);
         empleado.setFechaAlta(new Date());
-        empleado.setCategoria(categoriaService.obtenerPorId(info.categoriaId));
+        empleado.setCategoria(c.get());
         empleado.setEstadoId(1);
         empleadoService.crearEmpleado(empleado);
+
         GenericResponse gR = new GenericResponse();
         gR.isOk = true;
         gR.id = empleado.getEmpleadoId();
@@ -61,8 +72,12 @@ public class EmpleadoController {
     }
 
     @GetMapping("/empleadas/categorias/{categoriaId}")
-    public ResponseEntity<List<Empleado>> listarPorCategoriaId(@PathVariable int categoriaId){
-        List<Empleado> listaEmpleadas = categoriaService.obtenerPorId(categoriaId).getEmpleados();
+    public ResponseEntity<?> listarPorCategoriaId(@PathVariable int categoriaId){
+        Optional<Categoria> cId = categoriaService.obtenerPorId(categoriaId);
+        if(!cId.isPresent()){
+            return ResponseEntity.badRequest().body("Error, categoriaId= " + categoriaId + " inexistente");
+        }
+        List<Empleado> listaEmpleadas = cId.get().getEmpleados();
         return ResponseEntity.ok(listaEmpleadas);
     }
     // el /sueldos es una forma de expresar que es diferente al put de empleados id
