@@ -1,7 +1,7 @@
 package ar.com.ada.api.empleados.services;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +11,6 @@ import ar.com.ada.api.empleados.entities.Empleado;
 import ar.com.ada.api.empleados.entities.AltaEmpleado.AltaEmpleadoResultEnum;
 import ar.com.ada.api.empleados.entities.Empleado.EmpleadoEstadoEnum;
 import ar.com.ada.api.empleados.repos.EmpleadoRepo;
-import ch.qos.logback.core.joran.conditional.ElseAction;
 
 @Service
 public class EmpleadoService {
@@ -54,8 +53,8 @@ public class EmpleadoService {
         return repo.findAll();
     }
 
-    public Empleado obtenerPorId(int id) {
-        return repo.findById(id);
+    public Optional<Empleado> obtenerPorId(int id) {
+        return repo.findByDni(id);
     }
 
     /***
@@ -109,10 +108,10 @@ public class EmpleadoService {
         if (empleado.getDni() <= 0)
             return EmpleadoValidationType.DNI_INVALIDO;
 
-        Empleado e = repo.findByDni(empleado.getDni());
-        if (e != null) {
+        Optional<Empleado> e = repo.findByDni(empleado.getDni());
+        if (e.isEmpty()) {
             if (empleado.getEmpleadoId() != 0) {
-                if ((empleado.getEmpleadoId() != e.getEmpleadoId())) {
+                if ((empleado.getEmpleadoId() != e.get().getEmpleadoId())) {
                     return EmpleadoValidationType.EMPLEADO_DUPLICADO;
                 } else {
                     return EmpleadoValidationType.EMPLEADO_OK;
@@ -123,4 +122,25 @@ public class EmpleadoService {
         }
         return EmpleadoValidationType.EMPLEADO_OK;
     }
+
+	public Optional<Empleado> actualizarSueldo(int id, BigDecimal sueldoReq) {
+        Optional<Empleado> empleadoOp = repo.findById(id);
+        if(empleadoOp.isEmpty()){
+            return Optional.empty();
+        }
+        empleadoOp.get().setSueldo(sueldoReq);
+        grabar(empleadoOp.get());
+		return empleadoOp;
+    }
+    
+    public Optional<Empleado> bajarEmpleada(int id, Date fecha, EmpleadoEstadoEnum estado) {
+        Optional<Empleado> empleadoOp = repo.findById(id);
+        if(empleadoOp.isEmpty()){
+            return Optional.empty();
+        }
+        empleadoOp.get().setFechaBaja(fecha);
+        empleadoOp.get().setEstadoId(estado);
+        grabar(empleadoOp.get());
+        return empleadoOp;
+	}
 }

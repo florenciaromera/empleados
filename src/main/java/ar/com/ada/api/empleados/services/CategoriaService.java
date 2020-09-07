@@ -18,9 +18,12 @@ public class CategoriaService {
     @Autowired
     private CategoriaRepo repo;
 
-    public void crearCategoria(Categoria categoria) {
-        repo.save(categoria);
-
+    public Optional<Categoria> crearCategoria(Categoria categoria) {
+        Categoria c = obtenerPorId(categoria.getCategoriaId());
+        if(c == null){
+            return Optional.empty();
+        }
+        return Optional.of(repo.save(c));
     }
 
     public List<Categoria> obtenerCategorias() {
@@ -28,10 +31,7 @@ public class CategoriaService {
     }
 
     public Categoria obtenerPorId(int categoriaId) {
-        // el findById devuelve un optional, si la encuentra devuelve un objeto, sino
-        // nulo
         Optional<Categoria> c = repo.findById(categoriaId);
-
         if (c.isPresent())
             return c.get();
         return null;
